@@ -19,13 +19,29 @@ encode('#abc', 1) - печатает '$bcd'
 
 =cut
 
+sub getIndex {
+    my ($index) = @_;
+    my $countAscii = 127;
+
+    while($index > $countAscii && $index > 0) {
+        $index -= $countAscii;
+    }
+
+    while($index < $countAscii && $index < 0) {
+        $index += $countAscii;
+    }
+
+    return $index;
+}
+
 sub encode {
     my ($str, $key) = @_;
     my $encoded_str = '';
 
-    # ...
-    # Алгоритм шифрования
-    # ...
+    foreach my $ch (split('', $str)) {
+        my $index = getIndex(ord($ch) + $key);
+        $encoded_str .= chr($index);
+    }
 
     print "$encoded_str\n";
 }
@@ -45,9 +61,10 @@ sub decode {
     my ($encoded_str, $key) = @_;
     my $str = '';
 
-    # ...
-    # Алгоритм дешифрования
-    # ...
+    foreach my $ch (split('', $encoded_str)) {
+        my $index = getIndex(ord($ch) - $key);
+        $str .= chr($index);
+    }
 
     print "$str\n";
 }

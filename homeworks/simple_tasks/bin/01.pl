@@ -27,16 +27,19 @@ run(1, 1, 1) - печатает "No solution!\n"
 =cut
 
 sub run {
-    my ($a_value, $b_value, $c_value) = @_;
+    my ($a, $b, $c) = @_;
 
-    my $x1 = undef;
-    my $x2 = undef;
+    my $d = $b * $b - 4 * $a * $c;
 
-    #...
-    #Вычисление корней
-    #...
+    if($d >= 0 && $a != 0) {
+	    my $x1 = (-$b + sqrt($d)) / (2 * $a);
+	    my $x2 = (-$b - sqrt($d)) / (2 * $a);
 
-    print "$x1, $x2\n";
+	    print "$x1, $x2\n";
+    } else {
+    	print "No solution!\n";
+    }
+
 }
 
 1;

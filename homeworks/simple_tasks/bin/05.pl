@@ -30,9 +30,14 @@ sub run {
     my ($str, $substr) = @_;
     my $num = 0;
 
-    # ...
-    # Вычисление количества вохождений строки $substr в строку $str,
-    # ...
+    my $currentIndex = 0;
+    while ($currentIndex != -1) {
+    	$currentIndex = index($str, $substr, $currentIndex);
+    	if($currentIndex != -1) {
+    		$num++;
+    		$currentIndex += length($substr);
+    	}
+    }
 
     print "$num\n";
 }
