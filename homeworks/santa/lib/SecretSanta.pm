@@ -28,8 +28,10 @@ sub isNotHost {#тебе еще не дарили
 	return 1;
 }
 
-sub calculate {
-	my @members = @_;
+
+
+sub cal {
+	my ($counter, @members) = @_;
 	my @res;
 
 		while(my ($i, $v) = each @members) {			
@@ -39,7 +41,8 @@ sub calculate {
 				splice @candidatesForGift, $i, 1;#никто не дарит подарок сам себе и супругу
 
 				while ($#candidatesForGift + 1) {
-					my $hostIndex = int(rand ($#candidatesForGift + 1 - 0.000001) );
+					#незнал что последний аргумент не включается
+					my $hostIndex = int(rand ($#candidatesForGift + 1) );
 					my $host = $candidatesForGift[$hostIndex];
 
 					if(ref $host eq '' && 
@@ -66,16 +69,24 @@ sub calculate {
 
 			if(ref $v eq '') {
 				$flag = $tryPickPair->($v);
-			}
+			}	
 
 			if(ref $v eq 'ARRAY') {
 				$flag = $tryPickPair->($v->[0]) && $tryPickPair->($v->[1]);
 			}
 
-			return calculate(@members) if !$flag;
+			return cal($counter - 1, @members) if !$flag && $counter > 0;
+			return () if $counter <= 0;
 		}
 
 	return @res;
+}
+
+
+sub calculate {
+	my @members = @_;
+	my $counter = 20;
+	return cal($counter, @members);
 }
 
 1;
