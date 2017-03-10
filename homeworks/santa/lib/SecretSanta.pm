@@ -4,13 +4,77 @@ use 5.010;
 use strict;
 use warnings;
 use DDP;
+use Data::Dumper;
+
+sub isNotGiving {#этот человек не дарил тебе 
+	my ($you, $giving, @res) = @_;
+	for my $v (@res) {
+		if($v->[0] eq $giving && $v->[1] eq $you) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+sub isNotHost {#тебе еще не дарили
+	my ($host, @res) = @_;
+	for my $v (@res) {
+		if($v->[1] eq $host) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
 
 sub calculate {
 	my @members = @_;
 	my @res;
-	# ...
-	#	push @res,[ "fromname", "toname" ];
-	# ...
+
+		while(my ($i, $v) = each @members) {			
+			my $tryPickPair = sub {
+				my $v = shift;
+				my @candidatesForGift = @members;
+				splice @candidatesForGift, $i, 1;#никто не дарит подарок сам себе и супругу
+
+				while ($#candidatesForGift + 1) {
+					my $hostIndex = int(rand ($#candidatesForGift + 1 - 0.000001) );
+					my $host = $candidatesForGift[$hostIndex];
+
+					if(ref $host eq '' && 
+						isNotGiving($v, $host, @res) && 
+						isNotHost($host, @res)) {
+						push @res, [$v, $host];
+						return 1;
+					} elsif(ref $host eq 'ARRAY') {
+						foreach my $hostv (@$host){
+							if(isNotGiving($v, $hostv, @res) && 
+								isNotHost($hostv, @res)) {
+								push @res, [$v, $hostv];
+								return 1;
+							}
+						}
+					}
+
+					splice @candidatesForGift, $hostIndex, 1;
+				}
+				return 0;
+			}; 
+
+			my $flag = 0;
+
+			if(ref $v eq '') {
+				$flag = $tryPickPair->($v);
+			}
+
+			if(ref $v eq 'ARRAY') {
+				$flag = $tryPickPair->($v->[0]) && $tryPickPair->($v->[1]);
+			}
+
+			return calculate(@members) if !$flag;
+		}
+
 	return @res;
 }
 
